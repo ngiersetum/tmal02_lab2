@@ -6,6 +6,7 @@
 load('data/actable.mat')
 
 %% Task 2
+%acdata_matrix = table2array(acdata);
 % Averages
 average1 = mean(acdata{:, 4:17}, 'omitnan');
 average2 = mean(acdata{:, 20:56}, 'omitnan');
@@ -28,16 +29,19 @@ avg_wingload = average(1, 86);
 
 % c) Which is the fastest aircraft in the table, which one is the slowest?
 %    Do they have a difference in the thrust-to-weight ratio [N/N]?
-[max_velocity, index_fast] = max(acdata{:, 98});
-[min_velocity, index_slow] = min(acdata{:, 98});
-
+[max_velocity] = max(acdata{:, 99});
+index_fast = find(acdata{:, 99} == max_velocity);
+min_velocity = min(acdata{:, 99});
+index_slow = find(acdata{:, 99} == min_velocity);
 ratio_t_w1 = acdata{index_fast, 87};
 ratio_t_w2 = acdata{index_slow, 87};
 
 % d) Which aircraft has the lowest fuel consumption per passenger (pax) kilometre?
 %    Which one has the highest?
-[highest_fuel_ppx, index_high] = max(acdata{:, 116});
-[lowest_fuel_ppx, index_low] = min(acdata{:, 116});
+highest_fuel_ppx = max(acdata{:, 116});
+index_high = find(acdata{:, 116} == highest_fuel_ppx);
+lowest_fuel_ppx = min(acdata{:, 116});
+index_low = find(acdata{:, 116} == lowest_fuel_ppx);
 %% Task 3
 
 
