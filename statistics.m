@@ -20,7 +20,7 @@ Std3 = std(acdata{:, 58:117}, 'omitnan');
 Std = [Std1, nan, nan, Std2, nan, Std3];
 
 % a) What is the average wing-loading in [kg/m2]?
-avg_wingload = average(1, 83);
+avg_wingload = average(1, 86);
 
 % b) Which parameter has the lowest standard deviation?
 %    Why? Makes it sense to specify the standard deviation for this parameter?
@@ -29,8 +29,6 @@ avg_wingload = average(1, 83);
 % c) Which is the fastest aircraft in the table, which one is the slowest?
 %    Do they have a difference in the thrust-to-weight ratio [N/N]?
 [max_velocity, index_fast] = max(acdata{:, 98});
-%formatSpec = 'The fastest aircraft is %s \n';
-%fprintf(formatSpec, acdata(56, 1))
 [min_velocity, index_slow] = min(acdata{:, 98});
 
 ratio_t_w1 = acdata{index_fast, 87};
