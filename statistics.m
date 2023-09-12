@@ -110,12 +110,34 @@ paxseatssingle = table2array(acdata(:,"PaxSeatsSingleclass"));
 
 plot(fuelcons, paxseatssingle, "ro");
 
+% CLEAR CORRELATION
+
 % ii fuel cons per pax mile - max range
 
 fuelconspax = table2array(acdata(:,"PerfIndex_Fuelpaxnmkg"));
-maxranges = table2array(acdata(:,"Abreast"));
+maxranges = table2array(acdata(:,"Range_Maxfuelpayload"));
+
+plot(fuelconspax, maxranges, "bo")
+
+% NO CORRELATION
 
 % iii fuel cons per pax mile - mtow
 
+fuelconspax = table2array(acdata(:,"PerfIndex_Fuelpaxnmkg"));
+mtows = table2array(acdata(:,"MTOW"));
+
+plot(fuelconspax, mtows, "bo")
+
+% NO CORRELATION
+
+
+%% d) range vs maxfuel/MTOW
+
+maxranges = table2array(acdata(:,"Range_Maxfuelpayload"));
+fueltoratios = table2array(acdata(:,"MaxfuelMaxTO"));
+
+plot(maxranges, fueltoratios, "bo")
+
+% CLEAR CORRELATION
 
 %% Task 4
