@@ -48,8 +48,8 @@ index_low = find(acdata{:, 116} == lowest_fuel_ppx);
 
 % a) Wing loading vs MTOW
 
-mtows = table2array(wl_vs_mtow(:,"MTOW"));
-wls = table2array(wl_vs_mtow(:,"Perf_Maxwingloadkgm2"));
+mtows = table2array(acdata(:,"MTOW"));
+wls = table2array(acdata(:,"Perf_Maxwingloadkgm2"));
 
 pfit = polyfit(mtows, wls, 1);
 
@@ -88,7 +88,7 @@ end
 
 pfit = polyfit(wls, cvs, 1);
 
-wl_trend_std = std(cvs - polyval(pfit, wls));
+cv_trend_std = std(cvs - polyval(pfit, wls));
 
 hold off
 hold on
@@ -105,9 +105,15 @@ text(wls+dx, cvs, names, 'FontSize', 8);
 
 % i total fuel consumption - pax capacity
 
+fuelcons = table2array(acdata(:,"Perf_Cruise_LR_Fuelconsumptionkgh"));
+paxseatssingle = table2array(acdata(:,"PaxSeatsSingleclass"));
 
+plot(fuelcons, paxseatssingle, "ro");
 
 % ii fuel cons per pax mile - max range
+
+fuelconspax = table2array(acdata(:,"PerfIndex_Fuelpaxnmkg"));
+maxranges = table2array(acdata(:,"Abreast"));
 
 % iii fuel cons per pax mile - mtow
 
