@@ -50,17 +50,22 @@ index_low = find(acdata{:, 116} == lowest_fuel_ppx);
 
 mtows = table2array(acdata(:,"MTOW"));
 wls = table2array(acdata(:,"Perf_Maxwingloadkgm2"));
+names = table2array(acdata(:,"Name"));
 
-pfit = polyfit(mtows, wls, 1);
+pfit = polyfit(mtows, wls, 1)
 
-wl_trend_std = std(wls - polyval(pfit, mtows));
+wl_trend_std = std(wls - polyval(pfit, mtows))
 
 hold on
-plot(mtows, wls, 'ro');
-plot(mtows, polyval(pfit, mtows), 'b')
+plot(mtows, polyval(pfit, mtows), 'b', 'LineWidth', 1)
+plot(mtows, wls, 'ro', 'LineWidth', 1.25);
 xlabel("MTOW [kg]")
-ylabel("Max Wing Loading [kg/m^2]")
+ylabel("Wing Loading [kg/m^2]")
 title("Wing loading over MTOW")
+legend('Linear Fit', 'Location', 'northwest')
+
+dx = 8000;
+text(mtows+dx, wls, names, 'FontSize', 8);
 
 %% b) Cruise velocity vs wing loading
 
@@ -86,19 +91,20 @@ while done ~= 1
     end
 end
 
-pfit = polyfit(wls, cvs, 1);
+pfit = polyfit(wls, cvs, 1)
 
-cv_trend_std = std(cvs - polyval(pfit, wls));
+cv_trend_std = std(cvs - polyval(pfit, wls))
 
 hold off
 hold on
-plot(wls, cvs, "ro", 'LineWidth', 1.5);
-plot(wls, polyval(pfit, wls), 'b')
-xlabel("Max Wing Loading [kg/m^2]")
+plot(wls, polyval(pfit, wls), 'b', 'LineWidth', 1)
+plot(wls, cvs, "ro", 'LineWidth', 1.25);
+xlabel("Wing Loading [kg/m^2]")
 ylabel("Best Cruise Velocity [kts]")
-ylabel("Wind loading over Best Cruise Velocity")
+title("Best Cruise Velocity vs. Wing Loading")
+legend('Linear Fit', 'Location', 'northwest')
 
-dx = 4;
+dx = 10;
 text(wls+dx, cvs, names, 'FontSize', 8);
 
 %% c) Relations
@@ -135,9 +141,44 @@ plot(fuelconspax, mtows, "bo")
 
 maxranges = table2array(acdata(:,"Range_Maxfuelpayload"));
 fueltoratios = table2array(acdata(:,"MaxfuelMaxTO"));
+names = table2array(acdata(:,"Name"));
 
-plot(maxranges, fueltoratios, "bo")
+% plot(maxranges, fueltoratios, "bo")
 
 % CLEAR CORRELATION
+
+done = 0;
+i = 1;
+while done ~= 1
+    if isnan(maxranges(i)) || isnan(fueltoratios(i))
+        wsize = size(maxranges);
+        maxranges = [maxranges(1:i-1,:) ; maxranges(i+1:wsize(1),:)];
+        fueltoratios = [fueltoratios(1:i-1,:) ; fueltoratios(i+1:wsize(1),:)];
+        names = [names(1:i-1,:), ; names(i+1:wsize(1),:)];
+    else
+        i = i+1;
+    end
+
+    wsize = size(maxranges);
+    if i > wsize(1)
+        done = 1;
+    end
+end
+
+pfit = polyfit(maxranges, fueltoratios, 1)
+
+cv_trend_std = std(fueltoratios - polyval(pfit, maxranges))
+
+hold off
+hold on
+plot(maxranges, polyval(pfit, maxranges), 'b', 'LineWidth', 1)
+plot(maxranges, fueltoratios, "ro", 'LineWidth', 1.25);
+xlabel("Range [nm]")
+ylabel("Max Fuel to MTOW [-]")
+title("Max Fuel to MTOW vs. Range")
+legend('Linear Fit', 'Location', 'northwest')
+
+dx = 150;
+text(maxranges+dx, fueltoratios, names, 'FontSize', 8);
 
 %% Task 4
