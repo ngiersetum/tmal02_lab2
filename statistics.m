@@ -167,7 +167,7 @@ end
 
 pfit = polyfit(maxranges, fueltoratios, 1)
 
-cv_trend_std = std(fueltoratios - polyval(pfit, maxranges))
+fuelratio_trend_std = std(fueltoratios - polyval(pfit, maxranges))
 
 hold off
 hold on
@@ -182,3 +182,134 @@ dx = 150;
 text(maxranges+dx, fueltoratios, names, 'FontSize', 8);
 
 %% Task 4
+
+% a) pax cap vs. slenderness
+
+paxseatssingle = table2array(acdata(:,"PaxSeatsSingleclass"));
+slendernesses = table2array(acdata(:,"Fuse_FinessRatio"));
+names = table2array(acdata(:,"Name"));
+
+done = 0;
+i = 1;
+while done ~= 1
+    if isnan(paxseatssingle(i)) || isnan(slendernesses(i))
+        wsize = size(paxseatssingle);
+        paxseatssingle = [paxseatssingle(1:i-1,:) ; paxseatssingle(i+1:wsize(1),:)];
+        slendernesses = [slendernesses(1:i-1,:) ; slendernesses(i+1:wsize(1),:)];
+        names = [names(1:i-1,:), ; names(i+1:wsize(1),:)];
+    else
+        i = i+1;
+    end
+
+    wsize = size(paxseatssingle);
+    if i > wsize(1)
+        done = 1;
+    end
+end
+
+pfit = polyfit(paxseatssingle, slendernesses, 1)
+
+slenderness_trend_std = std(slendernesses - polyval(pfit, paxseatssingle))
+
+hold off
+hold on
+plot(paxseatssingle, polyval(pfit, paxseatssingle), 'b', 'LineWidth', 1)
+plot(paxseatssingle, slendernesses, "ro", 'LineWidth', 1.25);
+xlabel("Passenger Capacity (single class) [-]")
+ylabel("Fuselage Slenderness Ratio [-]")
+title("Fuselage Slenderness Ratio vs. Passenger Capacity (single class)")
+legend('Linear Fit', 'Location', 'northwest')
+
+dx = 15;
+text(paxseatssingle+dx, slendernesses, names, 'FontSize', 8);
+
+
+%% b) twr vs. wing loading
+
+wloading = table2array(acdata(:,"Perf_Maxwingloadkgm2"));
+twrs = table2array(acdata(:,"Perf_ThrustWeightRatio"));
+names = table2array(acdata(:,"Name"));
+nengs = table2array(acdata(:,"EngNumbersOf"));
+
+% discard NaN rows
+done = 0;
+i = 1;
+while done ~= 1
+    if isnan(wloading(i)) || isnan(twrs(i))
+        wsize = size(wloading);
+        wloading = [wloading(1:i-1,:) ; wloading(i+1:wsize(1),:)];
+        twrs = [twrs(1:i-1,:) ; twrs(i+1:wsize(1),:)];
+        names = [names(1:i-1,:), ; names(i+1:wsize(1),:)];
+        nengs = [nengs(1:i-1,:), ; nengs(i+1:wsize(1),:)];
+    else
+        i = i+1;
+    end
+
+    wsize = size(wloading);
+    if i > wsize(1)
+        done = 1;
+    end
+end
+
+% Split datasets by number of engines
+twr2 = twrs;
+twr3 = twrs;
+twr4 = twrs;
+
+len = size(nengs);
+
+for i=1:len(1)
+    twr2(i) = nan;
+    twr3(i) = nan;
+    twr4(i) = nan;
+    if nengs(i) == 2
+        twr2(i) = twrs(i);
+    elseif nengs(i) == 3
+        twr3(i) = twrs(i);
+    else
+        twr4(i) = twrs(i);
+    end
+end
+
+wl2fit = [];
+tw2fit = [];
+wl3fit = [];
+tw3fit = [];
+wl4fit = [];
+tw4fit = [];
+
+for i=1:len(1)
+    if ~isnan(twr2(i))
+        wl2fit = [wl2fit; wloading(i)];
+        tw2fit = [tw2fit; twr2(i)];
+    elseif ~isnan(twr3(i))
+        wl3fit = [wl3fit; wloading(i)];
+        tw3fit = [tw3fit; twr3(i)];
+    else
+        wl4fit = [wl4fit; wloading(i)];
+        tw4fit = [tw4fit; twr4(i)];
+    end
+end
+
+pfit2 = polyfit(wl2fit, tw2fit, 1)
+pfit3 = polyfit(wl3fit, tw3fit, 1)
+pfit4 = polyfit(wl4fit, tw4fit, 1)
+
+slenderness_trend_std = std(twr2 - polyval(pfit2, wloading))
+
+hold off
+hold on
+plot(wl2fit, polyval(pfit2, wl2fit), 'r', 'LineWidth', 1)
+plot(wl3fit, polyval(pfit3, wl3fit), 'g', 'LineWidth', 1)
+plot(wl4fit, polyval(pfit4, wl4fit), 'b', 'LineWidth', 1)
+plot(wloading, twr2, "ro", 'LineWidth', 1.25);
+plot(wloading, twr3, "go", 'LineWidth', 1.25);
+plot(wloading, twr4, "bo", 'LineWidth', 1.25);
+xlabel("Wing Loading [kg/m^2]")
+ylabel("Thrust to Weight Ratio [-]")
+title("Thrust to Weight Ratio vs. Wing Loading")
+legend('2 engines', '3 engines', '4 engines', 'Location', 'northwest')
+
+dx = 10;
+% text(wloading+dx, twrs, names, 'FontSize', 8);
+
