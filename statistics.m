@@ -313,3 +313,16 @@ legend('2 engines', '3 engines', '4 engines', 'Location', 'northwest')
 dx = 10;
 % text(wloading+dx, twrs, names, 'FontSize', 8);
 
+%% Task 5
+
+
+Cl_max = table2array(acdata(:,"CLmaxTO"));
+wing_area = table2array(acdata(:,"Area"));
+
+plot(Cl_max, wing_area, "bo");
+
+
+max_speed = table2array(acdata(:,"Speed_Mno"));
+thrust = table2array(acdata(:,"EngStaticThrustkN"));
+
+plot(max_speed, thrust, "bo");
