@@ -113,8 +113,43 @@ text(wls+dx, cvs, names, 'FontSize', 8);
 
 fuelcons = table2array(acdata(:,"Perf_Cruise_LR_Fuelconsumptionkgh"));
 paxseatssingle = table2array(acdata(:,"PaxSeatsSingleclass"));
+names = table2array(acdata(:,"Name"));
 
-plot(fuelcons, paxseatssingle, "ro");
+done = 0;
+i = 1;
+while done ~= 1
+    if isnan(fuelcons(i)) || isnan(paxseatssingle(i))
+        wsize = size(fuelcons);
+        fuelcons = [fuelcons(1:i-1,:) ; fuelcons(i+1:wsize(1),:)];
+        paxseatssingle = [paxseatssingle(1:i-1,:) ; paxseatssingle(i+1:wsize(1),:)];
+        names = [names(1:i-1,:), ; names(i+1:wsize(1),:)];
+    else
+        i = i+1;
+    end
+
+    wsize = size(fuelcons);
+    if i > wsize(1)
+        done = 1;
+    end
+end
+
+pfit = polyfit(fuelcons, paxseatssingle, 1)
+
+cv_trend_std = std(paxseatssingle - polyval(pfit, fuelcons))
+
+hold off
+hold on
+plot(fuelcons, polyval(pfit, fuelcons), 'r', 'LineWidth', 1)
+plot(fuelcons, paxseatssingle, "ro", 'LineWidth', 1.25);
+xlabel("Total Fuel Consumption [kg/h]")
+ylabel("Passenger Capacity (single class) [-]")
+title("Passenger Capacity (single class) vs. Total Fuel Consumption")
+legend('Linear Fit', 'Location', 'northwest')
+
+dx = 200;
+text(fuelcons+dx, paxseatssingle, names, 'FontSize', 8);
+
+% plot(fuelcons, paxseatssingle, "ro");
 
 % CLEAR CORRELATION
 
@@ -123,7 +158,7 @@ plot(fuelcons, paxseatssingle, "ro");
 fuelconspax = table2array(acdata(:,"PerfIndex_Fuelpaxnmkg"));
 maxranges = table2array(acdata(:,"Range_Maxfuelpayload"));
 
-plot(fuelconspax, maxranges, "bo")
+% plot(fuelconspax, maxranges, "bo")
 
 % NO CORRELATION
 
@@ -132,7 +167,7 @@ plot(fuelconspax, maxranges, "bo")
 fuelconspax = table2array(acdata(:,"PerfIndex_Fuelpaxnmkg"));
 mtows = table2array(acdata(:,"MTOW"));
 
-plot(fuelconspax, mtows, "bo")
+% plot(fuelconspax, mtows, "bo")
 
 % NO CORRELATION
 
