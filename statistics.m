@@ -315,8 +315,44 @@ dx = 10;
 
 %% Task 5
 
-
-max_speed = table2array(acdata(:,"Speed_Mno"));
+maxspeed = table2array(acdata(:,"Speed_Mno"));
 thrust = table2array(acdata(:,"EngStaticThrustkN"));
+names = table2array(acdata(:,"Name"));
 
-plot(max_speed, thrust, "bo");
+done = 0;
+i = 1;
+while done ~= 1
+    if isnan(maxspeed(i)) || isnan(thrust(i))
+        wsize = size(maxspeed);
+        maxspeed = [maxspeed(1:i-1,:) ; maxspeed(i+1:wsize(1),:)];
+        thrust = [thrust(1:i-1,:) ; thrust(i+1:wsize(1),:)];
+        names = [names(1:i-1,:), ; names(i+1:wsize(1),:)];
+    else
+        i = i+1;
+    end
+
+    wsize = size(maxspeed);
+    if i > wsize(1)
+        done = 1;
+    end
+end
+
+pfit = polyfit(maxspeed, thrust, 1)
+
+thrust_trend_std = std(thrust - polyval(pfit, maxspeed))
+
+hold off
+hold on
+plot(maxspeed, polyval(pfit, maxspeed), 'r', 'LineWidth', 1)
+plot(maxspeed, thrust, "ro", 'LineWidth', 0.75);
+xlabel("Maximum Speed (Mno) [Mach]")
+ylabel("Static Engine Thrust [kN]")
+title("Static Engine Thrust vs. Maximum Speed")
+legend('Linear Fit', 'Location', 'northwest')
+
+dx = 0.005;
+text(maxspeed+dx, thrust, names, 'FontSize', 8);
+
+
+
+% plot(maxspeed, thrust, "bo");
