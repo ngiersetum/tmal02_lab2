@@ -29,19 +29,19 @@ avg_wingload = average(1, 86);
 
 % c) Which is the fastest aircraft in the table, which one is the slowest?
 %    Do they have a difference in the thrust-to-weight ratio [N/N]?
-[max_velocity] = max(acdata{:, 99});
-index_fast = find(acdata{:, 99} == max_velocity);
-min_velocity = min(acdata{:, 99});
-index_slow = find(acdata{:, 99} == min_velocity);
-ratio_t_w1 = acdata{index_fast, 87};
-ratio_t_w2 = acdata{index_slow, 87};
+[max_velocity] = max(acdata{:, "Speed_Mno"});
+index_fast = find(acdata{:, "Speed_Mno"} == max_velocity);
+min_velocity = min(acdata{:, "Speed_Mno"});
+index_slow = find(acdata{:, "Speed_Mno"} == min_velocity);
+ratio_t_w1 = acdata{index_fast, "Perf_ThrustWeightRatio"};
+ratio_t_w2 = acdata{index_slow, "Perf_ThrustWeightRatio"};
 
 % d) Which aircraft has the lowest fuel consumption per passenger (pax) kilometre?
 %    Which one has the highest?
-highest_fuel_ppx = max(acdata{:, 116});
-index_high = find(acdata{:, 116} == highest_fuel_ppx);
-lowest_fuel_ppx = min(acdata{:, 116});
-index_low = find(acdata{:, 116} == lowest_fuel_ppx);
+highest_fuel_ppx = max(acdata{:, "PerfIndex_Fuelpaxnmkg"});
+index_high = find(acdata{:, "PerfIndex_Fuelpaxnmkg"} == highest_fuel_ppx);
+lowest_fuel_ppx = min(acdata{:, "PerfIndex_Fuelpaxnmkg"});
+index_low = find(acdata{:, "PerfIndex_Fuelpaxnmkg"} == lowest_fuel_ppx);
 
 
 %% TASK 3
@@ -314,12 +314,6 @@ dx = 10;
 % text(wloading+dx, twrs, names, 'FontSize', 8);
 
 %% Task 5
-
-
-Cl_max = table2array(acdata(:,"CLmaxTO"));
-wing_area = table2array(acdata(:,"Area"));
-
-plot(Cl_max, wing_area, "bo");
 
 
 max_speed = table2array(acdata(:,"Speed_Mno"));
