@@ -1,5 +1,26 @@
-
-
+% Statistics Script
+%   Calculations of different statistical correlations from an external
+%   data set on different aircraft types.
+%
+%   Code should be run in isolated sections to obtain certain plots,
+%   otherwise they will overwrite each other. As long as the first section
+%   is run once to load in the data, every section can run in any order.
+%
+% References
+%   Lab Data Set
+%
+% Authors
+    liuID1 = "nikgi434"; % Niklas Gierse
+    liuID2 = "leomu719"; % Leonhard Muehlstrasser
+%
+% License
+%   This program is part of an academic exercise for the course TMAL02,
+%   Linköping University, year 2023. The program is therefore free for 
+%   non-commercial academic use.
+%
+% Code History
+%   https://github.com/ngiersetum/tmal02_lab2
+%
 %% Executable Section
 
 % Load the data from the provided file as 'acdata'
@@ -52,10 +73,12 @@ mtows = table2array(acdata(:,"MTOW"));
 wls = table2array(acdata(:,"Perf_Maxwingloadkgm2"));
 names = table2array(acdata(:,"Name"));
 
+% Trend Line
 pfit = polyfit(mtows, wls, 1)
 
 wl_trend_std = std(wls - polyval(pfit, mtows))
 
+% Plotting
 hold on
 plot(mtows, polyval(pfit, mtows), 'b', 'LineWidth', 1)
 plot(mtows, wls, 'ro', 'LineWidth', 1.25);
@@ -73,6 +96,7 @@ wls = table2array(acdata(:,"Perf_Maxwingloadkgm2"));
 cvs = table2array(acdata(:,"Perf_Cruise_LR_Speedkt"));
 names = table2array(acdata(:,"Name"));
 
+% Eliminate NaN rows
 done = 0;
 i = 1;
 while done ~= 1
@@ -91,10 +115,12 @@ while done ~= 1
     end
 end
 
+% Trend Line
 pfit = polyfit(wls, cvs, 1)
 
 cv_trend_std = std(cvs - polyval(pfit, wls))
 
+% Plotting
 hold off
 hold on
 plot(wls, polyval(pfit, wls), 'b', 'LineWidth', 1)
@@ -115,6 +141,7 @@ fuelcons = table2array(acdata(:,"Perf_Cruise_LR_Fuelconsumptionkgh"));
 paxseatssingle = table2array(acdata(:,"PaxSeatsSingleclass"));
 names = table2array(acdata(:,"Name"));
 
+% Eliminate NaN rows
 done = 0;
 i = 1;
 while done ~= 1
@@ -133,10 +160,12 @@ while done ~= 1
     end
 end
 
+% Trend Line
 pfit = polyfit(fuelcons, paxseatssingle, 1)
 
 cv_trend_std = std(paxseatssingle - polyval(pfit, fuelcons))
 
+% Plotting
 hold off
 hold on
 plot(fuelcons, polyval(pfit, fuelcons), 'r', 'LineWidth', 1)
@@ -150,6 +179,7 @@ dx = 200;
 text(fuelcons+dx, paxseatssingle, names, 'FontSize', 8);
 % CLEAR CORRELATION
 
+
 % ii fuel cons per pax mile - max range
 
 fuelconspax = table2array(acdata(:,"PerfIndex_Fuelpaxnmkg"));
@@ -157,6 +187,7 @@ maxranges = table2array(acdata(:,"Range_Maxfuelpayload"));
 
 % plot(fuelconspax, maxranges, "bo")
 % NO CORRELATION
+
 
 % iii fuel cons per pax mile - mtow
 
