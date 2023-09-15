@@ -148,9 +148,6 @@ legend('Linear Fit', 'Location', 'northwest')
 
 dx = 200;
 text(fuelcons+dx, paxseatssingle, names, 'FontSize', 8);
-
-% plot(fuelcons, paxseatssingle, "ro");
-
 % CLEAR CORRELATION
 
 % ii fuel cons per pax mile - max range
@@ -159,7 +156,6 @@ fuelconspax = table2array(acdata(:,"PerfIndex_Fuelpaxnmkg"));
 maxranges = table2array(acdata(:,"Range_Maxfuelpayload"));
 
 % plot(fuelconspax, maxranges, "bo")
-
 % NO CORRELATION
 
 % iii fuel cons per pax mile - mtow
@@ -168,7 +164,6 @@ fuelconspax = table2array(acdata(:,"PerfIndex_Fuelpaxnmkg"));
 mtows = table2array(acdata(:,"MTOW"));
 
 % plot(fuelconspax, mtows, "bo")
-
 % NO CORRELATION
 
 
@@ -177,8 +172,6 @@ mtows = table2array(acdata(:,"MTOW"));
 maxranges = table2array(acdata(:,"Range_Maxfuelpayload"));
 fueltoratios = table2array(acdata(:,"MaxfuelMaxTO"));
 names = table2array(acdata(:,"Name"));
-
-% plot(maxranges, fueltoratios, "bo")
 
 % CLEAR CORRELATION
 
@@ -218,20 +211,23 @@ text(maxranges+dx, fueltoratios, names, 'FontSize', 8);
 
 %% Task 4
 
-% a) pax cap vs. slenderness
+% a) pax cap vs. slenderness, divided by seats configuration
 
 paxseatssingle = table2array(acdata(:,"PaxSeatsSingleclass"));
 slendernesses = table2array(acdata(:,"Fuse_FinessRatio"));
 names = table2array(acdata(:,"Name"));
+abreast = table2array(acdata(:,"Abreast"));
 
+% Eliminate NaN rows
 done = 0;
 i = 1;
 while done ~= 1
-    if isnan(paxseatssingle(i)) || isnan(slendernesses(i))
+    if isnan(paxseatssingle(i)) || isnan(slendernesses(i)) || isnan(abreast(i))
         wsize = size(paxseatssingle);
         paxseatssingle = [paxseatssingle(1:i-1,:) ; paxseatssingle(i+1:wsize(1),:)];
         slendernesses = [slendernesses(1:i-1,:) ; slendernesses(i+1:wsize(1),:)];
         names = [names(1:i-1,:), ; names(i+1:wsize(1),:)];
+        abreast = [abreast(1:i-1,:), ; abreast(i+1:wsize(1),:)];
     else
         i = i+1;
     end
@@ -242,20 +238,119 @@ while done ~= 1
     end
 end
 
-pfit = polyfit(paxseatssingle, slendernesses, 1)
+% Split datasets by number of seats abreast
+sld3 = slendernesses;
+sld4 = slendernesses;
+sld5 = slendernesses;
+sld6 = slendernesses;
+sld8 = slendernesses;
+sld9 = slendernesses;
+sld10 = slendernesses;
 
-slenderness_trend_std = std(slendernesses - polyval(pfit, paxseatssingle))
+len = size(abreast);
 
+for i=1:len(1)
+    sld3(i) = nan;
+    sld4(i) = nan;
+    sld5(i) = nan;
+    sld6(i) = nan;
+    sld8(i) = nan;
+    sld9(i) = nan;
+    sld10(i) = nan;
+
+    if abreast(i) == 3
+        sld3(i) = slendernesses(i);
+    elseif abreast(i) == 4
+        sld4(i) = slendernesses(i);
+    elseif abreast(i) == 5
+        sld5(i) = slendernesses(i);
+    elseif abreast(i) == 6
+        sld6(i) = slendernesses(i);
+    elseif abreast(i) == 8
+        sld8(i) = slendernesses(i);
+    elseif abreast(i) == 9
+        sld9(i) = slendernesses(i);
+    else
+        sld10(i) = slendernesses(i);
+    end
+end
+
+% Create trend lines for each category
+ps3fit = [];
+sl3fit = [];
+ps4fit = [];
+sl4fit = [];
+ps5fit = [];
+sl5fit = [];
+ps6fit = [];
+sl6fit = [];
+ps8fit = [];
+sl8fit = [];
+ps9fit = [];
+sl9fit = [];
+ps10fit = [];
+sl10fit = [];
+
+
+for i=1:len(1)
+    if ~isnan(sld3(i))
+        ps3fit = [ps3fit; paxseatssingle(i)];
+        sl3fit = [sl3fit; sld3(i)];
+    elseif ~isnan(sld4(i))
+        ps4fit = [ps4fit; paxseatssingle(i)];
+        sl4fit = [sl4fit; sld4(i)];
+    elseif ~isnan(sld5(i))
+        ps5fit = [ps5fit; paxseatssingle(i)];
+        sl5fit = [sl5fit; sld5(i)];
+    elseif ~isnan(sld6(i))
+        ps6fit = [ps6fit; paxseatssingle(i)];
+        sl6fit = [sl6fit; sld6(i)];
+    elseif ~isnan(sld8(i))
+        ps8fit = [ps8fit; paxseatssingle(i)];
+        sl8fit = [sl8fit; sld8(i)];
+    elseif ~isnan(sld9(i))
+        ps9fit = [ps9fit; paxseatssingle(i)];
+        sl9fit = [sl9fit; sld9(i)];
+    else
+        ps10fit = [ps10fit; paxseatssingle(i)];
+        sl10fit = [sl10fit; sld10(i)];
+    end
+end
+
+pfit3 = polyfit(ps3fit, sl3fit, 1)
+pfit4 = polyfit(ps4fit, sl4fit, 1)
+pfit5 = polyfit(ps5fit, sl5fit, 1)
+pfit6 = polyfit(ps6fit, sl6fit, 1)
+pfit8 = polyfit(ps8fit, sl8fit, 1)
+pfit9 = polyfit(ps9fit, sl9fit, 1)
+pfit10 = polyfit(ps10fit, sl10fit, 1)
+
+
+% Plot trend lines and data
 hold off
 hold on
-plot(paxseatssingle, polyval(pfit, paxseatssingle), 'b', 'LineWidth', 1)
-plot(paxseatssingle, slendernesses, "ro", 'LineWidth', 1.25);
+plot(ps3fit, polyval(pfit3, ps3fit), 'Color', "#0072BD", 'LineWidth', 1)
+plot(ps4fit, polyval(pfit4, ps4fit), 'Color', "#D95319", 'LineWidth', 1)
+plot(ps5fit, polyval(pfit5, ps5fit), 'Color', "#EDB120", 'LineWidth', 1)
+plot(ps6fit, polyval(pfit6, ps6fit), 'Color', "#7E2F8E", 'LineWidth', 1)
+plot(ps8fit, polyval(pfit8, ps8fit), 'Color', "#77AC30", 'LineWidth', 1)
+plot(ps9fit, polyval(pfit9, ps9fit), 'Color', "#4DBEEE", 'LineWidth', 1)
+plot(ps10fit, polyval(pfit10, ps10fit), 'Color', "#A2142F", 'LineWidth', 1)
+scatter(paxseatssingle, sld3, 'Color', "#0072BD", 'LineWidth', 1.25);
+scatter(paxseatssingle, sld4, 'Color', "#D95319", 'LineWidth', 1.25);
+scatter(paxseatssingle, sld5, 'Color', "#EDB120", 'LineWidth', 1.25);
+scatter(paxseatssingle, sld6, 'Color', "#7E2F8E", 'LineWidth', 1.25);
+scatter(paxseatssingle, sld8, 'Color', "#77AC30", 'LineWidth', 1.25);
+scatter(paxseatssingle, sld9, 'Color', "#4DBEEE", 'LineWidth', 1.25);
+scatter(paxseatssingle, sld10, 'Color', "#A2142F", 'LineWidth', 1.25);
+
 xlabel("Passenger Capacity (single class) [-]")
 ylabel("Fuselage Slenderness Ratio [-]")
 title("Fuselage Slenderness Ratio vs. Passenger Capacity (single class)")
-legend('Linear Fit', 'Location', 'northwest')
+legend('3 abreast', '4 abreast', '5 abreast', '6 abreast', '8 abreast', '9 abreast', '10 abreast', 'Location', 'northwest')
 
-dx = 15;
+% Data labels
+dx = 12;
 text(paxseatssingle+dx, slendernesses, names, 'FontSize', 8);
 
 
@@ -266,7 +361,7 @@ twrs = table2array(acdata(:,"Perf_ThrustWeightRatio"));
 names = table2array(acdata(:,"Name"));
 nengs = table2array(acdata(:,"EngNumbersOf"));
 
-% discard NaN rows
+% Eliminate NaN rows
 done = 0;
 i = 1;
 while done ~= 1
@@ -306,6 +401,7 @@ for i=1:len(1)
     end
 end
 
+% Create trend lines for each category
 wl2fit = [];
 tw2fit = [];
 wl3fit = [];
@@ -330,8 +426,7 @@ pfit2 = polyfit(wl2fit, tw2fit, 1)
 pfit3 = polyfit(wl3fit, tw3fit, 1)
 pfit4 = polyfit(wl4fit, tw4fit, 1)
 
-slenderness_trend_std = std(twr2 - polyval(pfit2, wloading))
-
+% Plot everything
 hold off
 hold on
 plot(wl2fit, polyval(pfit2, wl2fit), 'r', 'LineWidth', 1)
@@ -345,6 +440,7 @@ ylabel("Thrust to Weight Ratio [-]")
 title("Thrust to Weight Ratio vs. Wing Loading")
 legend('2 engines', '3 engines', '4 engines', 'Location', 'northwest')
 
+% Data labels
 dx = 10;
 % text(wloading+dx, twrs, names, 'FontSize', 8);
 
@@ -354,6 +450,7 @@ maxspeed = table2array(acdata(:,"Speed_Mno"));
 thrust = table2array(acdata(:,"EngStaticThrustkN"));
 names = table2array(acdata(:,"Name"));
 
+% Eliminate NaN rows
 done = 0;
 i = 1;
 while done ~= 1
@@ -372,10 +469,12 @@ while done ~= 1
     end
 end
 
+% Generate trend line
 pfit = polyfit(maxspeed, thrust, 1)
 
 thrust_trend_std = std(thrust - polyval(pfit, maxspeed))
 
+% Plot the stuff
 hold off
 hold on
 plot(maxspeed, polyval(pfit, maxspeed), 'r', 'LineWidth', 1)
@@ -385,6 +484,7 @@ ylabel("Static Engine Thrust [kN]")
 title("Static Engine Thrust vs. Maximum Speed")
 legend('Linear Fit', 'Location', 'northwest')
 
+% Data labels
 dx = 0.005;
 text(maxspeed+dx, thrust, names, 'FontSize', 8);
 
