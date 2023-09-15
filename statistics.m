@@ -21,7 +21,7 @@ Std3 = std(acdata{:, 58:117}, 'omitnan');
 Std = [Std1, nan, nan, Std2, nan, Std3];
 
 % a) What is the average wing-loading in [kg/m2]?
-avg_wingload = average(1, 86);
+avg_wingload = average(1, 86)
 
 % b) Which parameter has the lowest standard deviation?
 %    Why? Makes it sense to specify the standard deviation for this parameter?
